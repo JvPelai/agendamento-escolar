@@ -1,0 +1,7 @@
+{
+  "editor.defaultFormatter": "svipas.prettier-plus",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "svipas.prettier-plus"
+  }
+}
