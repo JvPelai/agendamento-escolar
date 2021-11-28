@@ -15,12 +15,15 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 import {
   getCalendarsEndpoint,
   getEventsEndpoint,
   ICalendar,
   IEvent,
 } from "./backend";
+import { addMonths, formatMonth } from "./dateFunctions";
 
 const DAYS_OF_WEEK = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
 
@@ -113,17 +116,14 @@ function generateCalendar(
   return weeks;
 }
 
-function getToday() {
-  return "2021-11-21";
-}
-
 export function CalendarScreen() {
+  const { month } = useParams<{ month: string }>();
   const classes = useStyles();
   const [events, setEvents] = useState<IEvent[]>([]);
   const [calendars, setCalendars] = useState<ICalendar[]>([]);
   const [calendarsSelected, setCalendarsSelected] = useState<boolean[]>([]);
   const weeks = generateCalendar(
-    getToday(),
+    month + "-01",
     events,
     calendars,
     calendarsSelected
@@ -180,15 +180,23 @@ export function CalendarScreen() {
       <Box flex="1" display="flex" flexDirection="column">
         <Box display="flex" alignItems="center" padding="8px 16px">
           <Box>
-            <IconButton aria-label="anterior">
+            <IconButton
+              aria-label="anterior"
+              component={Link}
+              to={`/calendar/${addMonths(month, -1)}`}
+            >
               <Icon>chevron_left</Icon>
             </IconButton>
-            <IconButton aria-label="próximo">
+            <IconButton
+              aria-label="próximo"
+              component={Link}
+              to={`/calendar/${addMonths(month, 1)}`}
+            >
               <Icon>chevron_right</Icon>
             </IconButton>
           </Box>
           <Box flex="1" marginLeft="16px" component="h3">
-            Novembro de 2021
+            {formatMonth(month)}
           </Box>
           <IconButton>
             <Avatar>
