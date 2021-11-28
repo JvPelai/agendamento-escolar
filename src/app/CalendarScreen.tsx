@@ -12,8 +12,8 @@ import {
 import { Calendar, ICalendarCell, IEventWithCalendar } from "./Calendar";
 import { CalendarHeader } from "./CalendarHeader";
 import { CalendarsView } from "./CalendarsView";
-
-const DAYS_OF_WEEK = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SAB"];
+import { getToday } from "./dateFunctions";
+import { EventFormDialog, IEditingEvent } from "./EventFormDialog";
 
 function generateCalendar(
   date: string,
@@ -32,7 +32,7 @@ function generateCalendar(
 
   do {
     const week: ICalendarCell[] = [];
-    for (let i = 0; i < DAYS_OF_WEEK.length; i++) {
+    for (let i = 0; i < 7; i++) {
       const monthStr = (currentDay.getMonth() + 1).toString().padStart(2, "0");
       const dayStr = currentDay.getDate().toString().padStart(2, "0");
       const isoDate = `${currentDay.getFullYear()}-${monthStr}-${dayStr}`;
@@ -66,6 +66,8 @@ export function CalendarScreen() {
   const [events, setEvents] = useState<IEvent[]>([]);
   const [calendars, setCalendars] = useState<ICalendar[]>([]);
   const [calendarsSelected, setCalendarsSelected] = useState<boolean[]>([]);
+  const [editingEvent, setEditingEvent] = useState<IEditingEvent | null>(null);
+
   const weeks = generateCalendar(
     month + "-01",
     events,
@@ -93,6 +95,14 @@ export function CalendarScreen() {
     newValue[i] = !newValue[i];
     setCalendarsSelected(newValue);
   }
+
+  function openNewEvent() {
+    setEditingEvent({
+      date: getToday(),
+      desc: "",
+      calendarId: calendars[0].id,
+    });
+  }
   return (
     <Box display="flex" height="100%" alignItems="stretch">
       <Box
@@ -101,7 +111,11 @@ export function CalendarScreen() {
         padding="8px 14px"
       >
         <h2>Agendamento Escolar</h2>
-        <Button variant="contained" color="primary">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={openNewEvent}
+        >
           Novo Evento
         </Button>
         <CalendarsView
@@ -113,6 +127,10 @@ export function CalendarScreen() {
       <Box flex="1" display="flex" flexDirection="column">
         <CalendarHeader month={month} />
         <Calendar weeks={weeks} />
+        <EventFormDialog
+          event={editingEvent}
+          onClose={() => setEditingEvent(null)}
+        />
       </Box>
     </Box>
   );
