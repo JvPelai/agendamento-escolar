@@ -13,7 +13,7 @@ export interface IEvent {
 }
 
 export async function getCalendarsEndpoint(): Promise<ICalendar[]> {
-  return fetch(`http://localhost:8080/calendars`).then((resp) => {
+  return fetch(`https://arcane-shore-50736.herokuapp.com/calendars`).then((resp) => {
     return resp.json();
   });
 }
@@ -23,7 +23,7 @@ export async function getEventsEndpoint(
   to: string
 ): Promise<IEvent[]> {
   return fetch(
-    `http://localhost:8080/appointments?date_gte=${from}&date_lte=${to}&_sort=date,time`
+    `https://arcane-shore-50736.herokuapp.com/appointments?date_gte=${from}&date_lte=${to}&_sort=date,time`
   ).then((resp) => {
     return resp.json();
   });

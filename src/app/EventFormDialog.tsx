@@ -9,6 +9,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
+import { ICalendar } from "./backend";
 
 export interface IEditingEvent {
   id?: number;
@@ -20,11 +21,12 @@ export interface IEditingEvent {
 
 interface IEventFormProps {
   event: IEditingEvent | null;
+  calendars: ICalendar[];
   onClose: () => void;
 }
 
 export function EventFormDialog(props: IEventFormProps) {
-  const { event, onClose } = props;
+  const { event, calendars, onClose } = props;
   return (
     <div>
       <Dialog
@@ -59,9 +61,12 @@ export function EventFormDialog(props: IEventFormProps) {
           />
           <FormControl margin="normal" fullWidth>
             <InputLabel id="select-calendar">Agenda</InputLabel>
-            <Select labelId="select-calendar">
-              <MenuItem value={1}>Pedagógico</MenuItem>
-              <MenuItem value={2}>Administrativo</MenuItem>
+            <Select labelId="select-calendar" value={event?.calendarId}>
+              {calendars.map((calendar) => (
+                <MenuItem key={calendar.id} value={calendar.id}>
+                  {calendar.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </DialogContent>

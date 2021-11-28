@@ -111,11 +111,7 @@ export function CalendarScreen() {
         padding="8px 14px"
       >
         <h2>Agendamento Escolar</h2>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={openNewEvent}
-        >
+        <Button variant="contained" color="primary" onClick={openNewEvent}>
           Novo Evento
         </Button>
         <CalendarsView
@@ -129,6 +125,7 @@ export function CalendarScreen() {
         <Calendar weeks={weeks} />
         <EventFormDialog
           event={editingEvent}
+          calendars={calendars}
           onClose={() => setEditingEvent(null)}
         />
       </Box>
