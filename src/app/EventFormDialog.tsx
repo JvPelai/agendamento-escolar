@@ -9,7 +9,12 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
-import { createEventEndpoint, ICalendar } from "./backend";
+import {
+  createEventEndpoint,
+  deleteEventEndpoint,
+  ICalendar,
+  updateEventEndpoint,
+} from "./backend";
 
 export interface IEditingEvent {
   id?: number;
@@ -37,6 +42,7 @@ export function EventFormDialog(props: IEventFormProps) {
   const inputTime = useRef<HTMLInputElement | null>();
   const inputDesc = useRef<HTMLInputElement | null>();
 
+  const isNew = !event?.id;
   useEffect(() => {
     setEventData(event);
   }, [event]);
@@ -65,8 +71,19 @@ export function EventFormDialog(props: IEventFormProps) {
     e.preventDefault();
     if (eventData) {
       if (validate()) {
-        createEventEndpoint(eventData).then(onSave);
+        if (isNew) {
+          createEventEndpoint(eventData).then(onSave);
+          return;
+        }
+        updateEventEndpoint(eventData).then(onSave);
+        return;
       }
+    }
+  }
+
+  function deleteEvent() {
+    if (eventData) {
+      deleteEventEndpoint(eventData.id!).then(onSave);
     }
   }
   return (
@@ -77,7 +94,9 @@ export function EventFormDialog(props: IEventFormProps) {
         aria-labelledby="form-dialog-title"
       >
         <form onSubmit={saveEvent}>
-          <DialogTitle id="form-dialog-title">Novo Evento</DialogTitle>
+          <DialogTitle id="form-dialog-title">
+            {isNew ? "Novo Evento" : "Editar Evento"}
+          </DialogTitle>
           <DialogContent>
             {eventData && (
               <>
@@ -145,6 +164,9 @@ export function EventFormDialog(props: IEventFormProps) {
             )}
           </DialogContent>
           <DialogActions>
+            <Button type="button" onClick={deleteEvent}>
+              Excluir
+            </Button>
             <Button type="button" onClick={onCancel}>
               Cancelar
             </Button>

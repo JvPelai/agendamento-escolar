@@ -7,9 +7,9 @@ export interface ICalendar {
 }
 
 export interface IEvent {
-  id: number;
+  id?: number;
   date: string;
-  time?: string;
+  time: string;
   desc: string;
   calendarId: number;
 }
@@ -43,6 +43,32 @@ export async function createEventEndpoint(
     },
     body: JSON.stringify(event),
   }).then((resp) => {
+    return resp.json();
+  });
+}
+
+export async function updateEventEndpoint(event: IEditingEvent): Promise<any> {
+  return fetch(
+    `https://arcane-shore-50736.herokuapp.com/appointments/${event.id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(event),
+    }
+  ).then((resp) => {
+    return resp.json();
+  });
+}
+
+export async function deleteEventEndpoint(eventId: number): Promise<any> {
+  return fetch(
+    `https://arcane-shore-50736.herokuapp.com/appointments/${eventId}`,
+    {
+      method: "DELETE",
+    }
+  ).then((resp) => {
     return resp.json();
   });
 }

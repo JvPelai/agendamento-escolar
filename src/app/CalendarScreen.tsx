@@ -100,14 +100,15 @@ export function CalendarScreen() {
     setCalendarsSelected(newValue);
   }
 
-  function openNewEvent() {
+  function openNewEvent(date: string) {
     setEditingEvent({
-      date: getToday(),
+      date,
       time: "",
       desc: "",
       calendarId: calendars[0].id,
     });
   }
+
   return (
     <Box display="flex" height="100%" alignItems="stretch">
       <Box
@@ -116,7 +117,11 @@ export function CalendarScreen() {
         padding="8px 14px"
       >
         <h2>Agendamento Escolar</h2>
-        <Button variant="contained" color="primary" onClick={openNewEvent}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => openNewEvent(getToday())}
+        >
           Novo Evento
         </Button>
         <CalendarsView
@@ -127,7 +132,11 @@ export function CalendarScreen() {
       </Box>
       <Box flex="1" display="flex" flexDirection="column">
         <CalendarHeader month={month} />
-        <Calendar weeks={weeks} />
+        <Calendar
+          weeks={weeks}
+          onClickDay={openNewEvent}
+          onClickEvent={setEditingEvent}
+        />
         <EventFormDialog
           event={editingEvent}
           calendars={calendars}
