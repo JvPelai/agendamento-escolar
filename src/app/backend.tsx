@@ -1,3 +1,5 @@
+import { IEditingEvent } from "./EventFormDialog";
+
 export interface ICalendar {
   id: number;
   name: string;
@@ -13,9 +15,11 @@ export interface IEvent {
 }
 
 export async function getCalendarsEndpoint(): Promise<ICalendar[]> {
-  return fetch(`https://arcane-shore-50736.herokuapp.com/calendars`).then((resp) => {
-    return resp.json();
-  });
+  return fetch(`https://arcane-shore-50736.herokuapp.com/calendars`).then(
+    (resp) => {
+      return resp.json();
+    }
+  );
 }
 
 export async function getEventsEndpoint(
@@ -25,6 +29,20 @@ export async function getEventsEndpoint(
   return fetch(
     `https://arcane-shore-50736.herokuapp.com/appointments?date_gte=${from}&date_lte=${to}&_sort=date,time`
   ).then((resp) => {
+    return resp.json();
+  });
+}
+
+export async function createEventEndpoint(
+  event: IEditingEvent
+): Promise<IEvent> {
+  return fetch(`https://arcane-shore-50736.herokuapp.com/appointments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(event),
+  }).then((resp) => {
     return resp.json();
   });
 }
