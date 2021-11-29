@@ -13,7 +13,8 @@ export const MONTHS = [
   "Dezembro",
 ];
 export function getToday() {
-  return "2021-11-21";
+  const date = new Date().toISOString().split("T")[0];
+  return date;
 }
 
 export function formatMonth(isoMonth: string) {
@@ -24,5 +25,7 @@ export function formatMonth(isoMonth: string) {
 export function addMonths(month: string, increment: number) {
   const jsDate = new Date(month + "-01T12:00:00");
   jsDate.setMonth(jsDate.getMonth() + increment);
-  return `${jsDate.getFullYear()}-${(jsDate.getMonth() + 1).toString().padStart(2,"0")}`;
+  return `${jsDate.getFullYear()}-${(jsDate.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}`;
 }

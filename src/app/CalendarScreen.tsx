@@ -90,6 +90,10 @@ export function CalendarScreen() {
     });
   }, [firstDate, lastDate]);
 
+  function refreshEvents() {
+    getEventsEndpoint(firstDate, lastDate).then(setEvents);
+  }
+
   function toggleCalendar(i: number) {
     const newValue = [...calendarsSelected];
     newValue[i] = !newValue[i];
@@ -99,6 +103,7 @@ export function CalendarScreen() {
   function openNewEvent() {
     setEditingEvent({
       date: getToday(),
+      time: "",
       desc: "",
       calendarId: calendars[0].id,
     });
@@ -126,7 +131,11 @@ export function CalendarScreen() {
         <EventFormDialog
           event={editingEvent}
           calendars={calendars}
-          onClose={() => setEditingEvent(null)}
+          onCancel={() => setEditingEvent(null)}
+          onSave={() => {
+            setEditingEvent(null);
+            refreshEvents();
+          }}
         />
       </Box>
     </Box>

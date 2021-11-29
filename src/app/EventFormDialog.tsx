@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -14,7 +14,7 @@ import { createEventEndpoint, ICalendar } from "./backend";
 export interface IEditingEvent {
   id?: number;
   date: string;
-  time?: string;
+  time: string;
   desc: string;
   calendarId: number;
 }
@@ -22,27 +22,58 @@ export interface IEditingEvent {
 interface IEventFormProps {
   event: IEditingEvent | null;
   calendars: ICalendar[];
-  onClose: () => void;
+  onCancel: () => void;
+  onSave: () => void;
+}
+interface IValidationErrors {
+  [field: string]: string;
 }
 
 export function EventFormDialog(props: IEventFormProps) {
-  const { event, calendars, onClose } = props;
+  const { event, calendars, onCancel, onSave } = props;
   const [eventData, setEventData] = useState<IEditingEvent | null>(event);
+  const [errors, setErrors] = useState<IValidationErrors>({});
+  const inputDate = useRef<HTMLInputElement | null>();
+  const inputTime = useRef<HTMLInputElement | null>();
+  const inputDesc = useRef<HTMLInputElement | null>();
+
   useEffect(() => {
     setEventData(event);
   }, [event]);
 
+  function validate(): boolean {
+    if (eventData) {
+      const currentErrors: IValidationErrors = {};
+      if (!eventData.date) {
+        currentErrors["date"] = "é preciso selecionar uma data válida";
+        inputDate.current?.focus();
+      }
+      if (eventData.time.length <= 1) {
+        currentErrors["time"] = "é preciso selecionar um horário válido";
+        inputTime.current?.focus();
+      }
+      if (eventData.desc.length < 4) {
+        currentErrors["desc"] = "A descrição é muito curta";
+        inputDesc.current?.focus();
+      }
+      setErrors(currentErrors);
+      return Object.keys(currentErrors).length === 0;
+    }
+    return false;
+  }
   function saveEvent(e: React.FormEvent) {
     e.preventDefault();
     if (eventData) {
-      createEventEndpoint(eventData).then(onClose);
+      if (validate()) {
+        createEventEndpoint(eventData).then(onSave);
+      }
     }
   }
   return (
     <div>
       <Dialog
         open={!!event}
-        onClose={onClose}
+        onClose={onCancel}
         aria-labelledby="form-dialog-title"
       >
         <form onSubmit={saveEvent}>
@@ -51,6 +82,7 @@ export function EventFormDialog(props: IEventFormProps) {
             {eventData && (
               <>
                 <TextField
+                  inputRef={inputDate}
                   type="date"
                   margin="normal"
                   label="Data"
@@ -59,9 +91,12 @@ export function EventFormDialog(props: IEventFormProps) {
                   onChange={(e) =>
                     setEventData({ ...eventData, date: e.target.value })
                   }
+                  error={!!errors.date}
+                  helperText={errors.date}
                   fullWidth
                 />
                 <TextField
+                  inputRef={inputTime}
                   type="time"
                   margin="normal"
                   label="Hora"
@@ -70,9 +105,12 @@ export function EventFormDialog(props: IEventFormProps) {
                   onChange={(e) =>
                     setEventData({ ...eventData, time: e.target.value })
                   }
+                  error={!!errors.time}
+                  helperText={errors.time}
                   fullWidth
                 />
                 <TextField
+                  inputRef={inputDesc}
                   autoFocus
                   margin="normal"
                   value={eventData.desc}
@@ -80,6 +118,8 @@ export function EventFormDialog(props: IEventFormProps) {
                   onChange={(e) =>
                     setEventData({ ...eventData, desc: e.target.value })
                   }
+                  error={!!errors.desc}
+                  helperText={errors.desc}
                   fullWidth
                 />
                 <FormControl margin="normal" fullWidth>
@@ -105,7 +145,7 @@ export function EventFormDialog(props: IEventFormProps) {
             )}
           </DialogContent>
           <DialogActions>
-            <Button type="button" onClick={onClose}>
+            <Button type="button" onClick={onCancel}>
               Cancelar
             </Button>
             <Button type="submit" color="primary">
